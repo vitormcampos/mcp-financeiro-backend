@@ -1,18 +1,23 @@
-import { Component, computed, inject } from '@angular/core';
-import { CashflowStore } from '../../stores/cashflow.store';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
+import { Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { CashflowStore } from '../../stores/cashflow.store';
 import { ChatAiStore } from '../../stores/chat-ai.store';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
+  private readonly authService = inject(AuthService);
   private readonly cashFlowStore = inject(CashflowStore);
   private readonly chatAiStore = inject(ChatAiStore);
+
+  userIsLoggedIn = this.authService.isLoggedIn();
 
   cashFlows = toSignal(this.cashFlowStore.get(), { initialValue: [] });
 
@@ -35,8 +40,4 @@ export class NavbarComponent {
   });
 
   showChatAi = toSignal(this.chatAiStore.get(), { initialValue: false });
-
-  toggleChatAi() {
-    this.chatAiStore.set(!this.showChatAi());
-  }
 }
