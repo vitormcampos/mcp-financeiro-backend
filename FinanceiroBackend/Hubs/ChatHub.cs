@@ -1,9 +1,12 @@
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.AI;
 using ModelContextProtocol.Client;
 
 namespace Web.Hubs;
 
+[Authorize]
 public class ChatHub : Hub
 {
     private readonly IChatClient _chatClient;
@@ -35,11 +38,18 @@ public class ChatHub : Hub
             new(ChatRole.User, prompt),
         };
 
-        var response = await _chatClient.GetResponseAsync(
+        var responses = _chatClient.GetStreamingResponseAsync(
             messages,
             options: new() { Tools = [.. tools], AllowMultipleToolCalls = true }
         );
 
-        await Clients.Caller.SendAsync("ReceivePrompt", response.Text);
+        var responseStringBuilder = new StringBuilder();
+
+        await foreach (var response in responses)
+        {
+            responseStringBuilder.Append(response.Text);
+        }
+
+        await Clients.Caller.SendAsync("ReceivePrompt", responseStringBuilder.ToString());
     }
 }

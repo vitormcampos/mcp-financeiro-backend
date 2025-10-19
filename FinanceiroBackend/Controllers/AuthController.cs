@@ -1,5 +1,6 @@
 using Application.Services;
 using Domain.Dtos.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
@@ -28,5 +29,12 @@ public class AuthController(JwtService jwtService, UserService userService) : Co
         var token = jwtService.GenerateToken(user);
 
         return Ok(new { token });
+    }
+
+    [HttpGet("check-auth")]
+    [Authorize]
+    public IActionResult CheckAuth()
+    {
+        return Ok(new { message = "Authenticated" });
     }
 }
