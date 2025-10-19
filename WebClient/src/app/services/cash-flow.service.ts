@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { CashFlow } from '../models/cash-flow';
+import { authTokenKey } from '../models/user-token';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,7 @@ export class CashFlowService {
     month = 0,
     year = 0,
     status = '',
-    type = ''
+    type = '',
   ) {
     const params = new HttpParams()
       .set('Description', description || '')
@@ -28,7 +29,12 @@ export class CashFlowService {
 
     return this.httpClient.get<CashFlow[]>(
       `${import.meta.env['NG_APP_PUBLIC_URL']}/api/conta`,
-      { params }
+      {
+        params,
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem(authTokenKey)!,
+        },
+      },
     );
   }
 
@@ -40,7 +46,12 @@ export class CashFlowService {
   }) {
     return this.httpClient.post<CashFlow>(
       `${import.meta.env['NG_APP_PUBLIC_URL']}/api/conta`,
-      cashFlow
+      cashFlow,
+      {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem(authTokenKey)!,
+        },
+      },
     );
   }
 }

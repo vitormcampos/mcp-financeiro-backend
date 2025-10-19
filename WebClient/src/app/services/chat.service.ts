@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import * as signalR from '@microsoft/signalr';
+import { authTokenKey } from '../models/user-token';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +23,7 @@ export class ChatService {
       .withUrl(import.meta.env['NG_APP_PUBLIC_URL'] + '/chat', {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
+        accessTokenFactory: () => localStorage.getItem(authTokenKey) || '',
       }) // 🔧 Ajuste para sua URL real
       .withAutomaticReconnect()
       .build();
