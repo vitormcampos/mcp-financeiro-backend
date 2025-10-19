@@ -45,6 +45,8 @@ public class ContaService(FinanceiroContext context)
             queryable = queryable.Where(c => c.Type == query.Type);
         }
 
+        queryable = queryable.Where(c => c.UserId == query.UserId);
+
         return await queryable.ToListAsync();
     }
 
@@ -60,6 +62,7 @@ public class ContaService(FinanceiroContext context)
             Mouth = DateTime.UtcNow.Month,
             Year = DateTime.UtcNow.Year,
             CreatedAt = DateTime.UtcNow,
+            UserId = createContaconta.UserId!,
         };
 
         context.Contas.Add(conta);
@@ -68,15 +71,17 @@ public class ContaService(FinanceiroContext context)
         return conta;
     }
 
-    public async Task<Conta> GetByIdAsync(string id)
+    public async Task<Conta> GetByIdAsync(string id, string userId)
     {
-        return await context.Contas.FirstAsync(c => c.Id == id || c.Description.Contains(id));
+        return await context.Contas.FirstAsync(c =>
+            (c.Id == id || c.Description.Contains(id)) && c.UserId == userId
+        );
     }
 
     public async Task<Conta> UpdateAsync(string id, CreateConta createContaconta)
     {
         context
-            .Contas.Where(c => c.Id == id)
+            .Contas.Where(c => c.Id == id && c.UserId == createContaconta.UserId)
             .ExecuteUpdate(c =>
                 c.SetProperty(c => c.Description, createContaconta.Description)
                     .SetProperty(c => c.Amount, createContaconta.Amount)
@@ -89,8 +94,8 @@ public class ContaService(FinanceiroContext context)
         return conta;
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task DeleteAsync(string id, string userId)
     {
-        await context.Contas.Where(c => c.Id == id).ExecuteDeleteAsync();
+        await context.Contas.Where(c => c.Id == id && c.UserId == userId).ExecuteDeleteAsync();
     }
 }

@@ -7,5 +7,6 @@ public record ContasGetAll(
     sbyte? Month,
     short? Year,
     string? Status,
-    string? Type
+    string? Type,
+    string? UserId
 );

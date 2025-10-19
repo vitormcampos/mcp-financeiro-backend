@@ -35,4 +35,6 @@ public class CreateConta
         ErrorMessage = "Status inválido. Valores permitidos: INCOME, EXPENSE ou INVESTMENT."
     )]
     public required string Type { get; init; }
+
+    public string? UserId { get; set; }
 }

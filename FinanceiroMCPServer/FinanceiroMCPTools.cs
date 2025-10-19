@@ -27,10 +27,20 @@ public class FinanceiroMCPTools
         sbyte month = 0,
         short year = 0,
         string status = "",
-        string type = ""
+        string type = "",
+        string userId = ""
     )
     {
-        var query = new ContasGetAll(description, minValue, maxValue, month, year, status, type);
+        var query = new ContasGetAll(
+            description,
+            minValue,
+            maxValue,
+            month,
+            year,
+            status,
+            type,
+            userId
+        );
 
         return await _contaService.GetAllAsync(query);
     }
@@ -39,9 +49,9 @@ public class FinanceiroMCPTools
         McpServerTool(Name = nameof(GetContaById), Title = nameof(GetContaById)),
         Description("Obtem uma conta pelo ID ou descrição")
     ]
-    public async Task<Conta?> GetContaById(string idOrDescription)
+    public async Task<Conta?> GetContaById(string idOrDescription, string userId)
     {
-        return await _contaService.GetByIdAsync(idOrDescription);
+        return await _contaService.GetByIdAsync(idOrDescription, userId);
     }
 
     [
@@ -52,7 +62,8 @@ public class FinanceiroMCPTools
         string description,
         string status,
         decimal amount,
-        string category
+        string category,
+        string userId
     )
     {
         return await _contaService.AddAsync(
@@ -62,6 +73,7 @@ public class FinanceiroMCPTools
                 Amount = amount,
                 Status = status,
                 Type = category,
+                UserId = userId,
             }
         );
     }
