@@ -1,6 +1,31 @@
 <div class="container">
   @if (cashFlows$ | async; as cashFlows) {
-    <h2>Fluxo de caixa</h2>
+    <div class="row p-3">
+      <div class="col-9 bg-white rounded-3 p-3">
+        <div class="row justify-content-between">
+          <div class="col-4 bg-white">
+            <div class="">
+              <h3>Fluxo de caixa</h3>
+            </div>
+          </div>
+          <div class="col bg-white">
+            <div class="text-end">
+              <div class="d-flex align-items-center"></div>
+              <app-filter />
+              <app-upsert />
+              <button class="btn btn-danger ms-2" (click)="toggleChatAi()">
+                @if (showChatAi()) {
+                  Fechar
+                } @else {
+                  Abrir
+                }
+                Chat IA
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <table class="table table-striped-columns table-sm">
       <thead>
         <tr class="table-primary">
