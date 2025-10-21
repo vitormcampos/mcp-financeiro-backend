@@ -1,6 +1,6 @@
-﻿namespace Domain.Dtos;
+﻿namespace Domain.Dtos.CashFlow;
 
-public record ContasGetAll(
+public record CashFlowsGetAll(
     string? Description,
     decimal? MinValue,
     decimal? MaxValue,

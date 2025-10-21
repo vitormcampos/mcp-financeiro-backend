@@ -1,26 +1,26 @@
 using System.ComponentModel;
 using Application.Services;
-using Domain;
-using Domain.Dtos;
+using Domain.Dtos.CashFlow;
+using Domain.Models;
 using ModelContextProtocol.Server;
-
-namespace FinanceiroMCP;
 
 [McpServerToolType]
 public class FinanceiroMCPTools
 {
-    private readonly ContaService _contaService;
+    private readonly CashFlowService _cashFlowService;
 
-    public FinanceiroMCPTools(ContaService contaService)
+    public FinanceiroMCPTools(CashFlowService cashFlowService)
     {
-        _contaService = contaService;
+        _cashFlowService = cashFlowService;
     }
 
     [
-        McpServerTool(Name = nameof(GetContas), Title = nameof(GetContas)),
-        Description("Obtem todas as contas com filtros opcionais")
+        McpServerTool(Name = nameof(GetCashFlows), Title = nameof(GetCashFlows)),
+        Description(
+            "Retrieves all cash flow records with optional filters for description, value range, date, status, type, and user."
+        )
     ]
-    public async Task<IEnumerable<Conta>> GetContas(
+    public async Task<IEnumerable<CashFlow>> GetCashFlows(
         string description = "",
         decimal minValue = 0,
         decimal maxValue = 0,
@@ -31,7 +31,7 @@ public class FinanceiroMCPTools
         string userId = ""
     )
     {
-        var query = new ContasGetAll(
+        var query = new CashFlowsGetAll(
             description,
             minValue,
             maxValue,
@@ -42,37 +42,43 @@ public class FinanceiroMCPTools
             userId
         );
 
-        return await _contaService.GetAllAsync(query);
+        return await _cashFlowService.GetAllAsync(query);
     }
 
     [
-        McpServerTool(Name = nameof(GetContaById), Title = nameof(GetContaById)),
-        Description("Obtem uma conta pelo ID ou descrição")
+        McpServerTool(Name = nameof(GetCashFlow), Title = nameof(GetCashFlow)),
+        Description("Retrieves a cash flow record by its ID or description.")
     ]
-    public async Task<Conta?> GetContaById(string idOrDescription, string userId)
+    public async Task<CashFlow?> GetCashFlow(string idOrDescription, string userId)
     {
-        return await _contaService.GetByIdAsync(idOrDescription, userId);
+        return await _cashFlowService.GetByIdAsync(idOrDescription, userId);
     }
 
     [
-        McpServerTool(Name = nameof(CreateConta), Title = nameof(CreateConta)),
-        Description("Cria uma nova conta na base de dados")
+        McpServerTool(Name = nameof(CreateCashFlow), Title = nameof(CreateCashFlow)),
+        Description(
+            "Creates a new cash flow record in the database. "
+                + "Required fields: description, amount, status, type, and user ID. "
+                + "The 'amount' must be greater than zero. "
+                + "Accepted values for 'status': PENDING or PAID. "
+                + "Accepted values for 'type': INCOME, EXPENSE, or INVESTMENT."
+        )
     ]
-    public async Task<Conta?> CreateConta(
+    public async Task<CashFlow?> CreateCashFlow(
         string description,
         string status,
         decimal amount,
-        string category,
+        string type,
         string userId
     )
     {
-        return await _contaService.AddAsync(
-            new CreateConta
+        return await _cashFlowService.AddAsync(
+            new CreateCashFlow
             {
                 Description = description,
                 Amount = amount,
                 Status = status,
-                Type = category,
+                Type = type,
                 UserId = userId,
             }
         );

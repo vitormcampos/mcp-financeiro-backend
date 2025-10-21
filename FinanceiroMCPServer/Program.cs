@@ -1,5 +1,4 @@
 ﻿using Application.Ioc;
-using FinanceiroMCP;
 
 var builder = WebApplication.CreateBuilder(args);
 

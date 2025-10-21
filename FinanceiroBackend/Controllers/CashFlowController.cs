@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Application.Services;
-using Domain.Dtos;
+using Domain.Dtos.CashFlow;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,32 +9,32 @@ namespace Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ContaController : ControllerBase
+public class CashFlowController : ControllerBase
 {
-    private readonly ContaService _contaService;
+    private readonly CashFlowService _cashflowService;
 
-    public ContaController(ContaService contaService)
+    public CashFlowController(CashFlowService cashflowService)
     {
-        _contaService = contaService;
+        _cashflowService = cashflowService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] CreateConta conta)
+    public async Task<IActionResult> Add([FromBody] CreateCashFlow cashflow)
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
-        conta.UserId = userId;
+        cashflow.UserId = userId;
 
-        var result = await _contaService.AddAsync(conta);
+        var result = await _cashflowService.AddAsync(cashflow);
 
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] ContasGetAll query)
+    public async Task<IActionResult> GetAll([FromQuery] CashFlowsGetAll query)
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
 
-        var result = await _contaService.GetAllAsync(query with { UserId = userId });
+        var result = await _cashflowService.GetAllAsync(query with { UserId = userId });
 
         return Ok(result);
     }
@@ -44,18 +44,18 @@ public class ContaController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
 
-        var result = await _contaService.GetByIdAsync(id, userId);
+        var result = await _cashflowService.GetByIdAsync(id, userId);
 
         return Ok(result);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] CreateConta conta)
+    public async Task<IActionResult> Update(string id, [FromBody] CreateCashFlow cashflow)
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
-        conta.UserId = userId;
+        cashflow.UserId = userId;
 
-        var result = await _contaService.UpdateAsync(id, conta);
+        var result = await _cashflowService.UpdateAsync(id, cashflow);
 
         return Ok(result);
     }
@@ -65,7 +65,7 @@ public class ContaController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
 
-        await _contaService.DeleteAsync(id, userId);
+        await _cashflowService.DeleteAsync(id, userId);
 
         return NoContent();
     }

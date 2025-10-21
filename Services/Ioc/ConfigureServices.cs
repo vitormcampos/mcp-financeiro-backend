@@ -10,7 +10,7 @@ public static class ConfigureServices
         services.AddScoped<HashService>();
         services.AddScoped<JwtService>();
         services.AddScoped<UserService>();
-        services.AddScoped<ContaService>();
+        services.AddScoped<CashFlowService>();
 
         return services;
     }

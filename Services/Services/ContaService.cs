@@ -1,14 +1,14 @@
-using Domain;
-using Domain.Dtos;
+using Domain.Dtos.CashFlow;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
-public class ContaService(FinanceiroContext context)
+public class CashFlowService(FinanceiroContext context)
 {
-    public async Task<IEnumerable<Conta>> GetAllAsync(ContasGetAll query)
+    public async Task<IEnumerable<CashFlow>> GetAllAsync(CashFlowsGetAll query)
     {
-        var queryable = context.Contas.AsQueryable();
+        var queryable = context.CashFlows.AsQueryable();
 
         if (query.Description is not null)
         {
@@ -47,55 +47,55 @@ public class ContaService(FinanceiroContext context)
 
         queryable = queryable.Where(c => c.UserId == query.UserId);
 
-        return await queryable.ToListAsync();
+        return await queryable.AsNoTracking().ToListAsync();
     }
 
-    public async Task<Conta> AddAsync(CreateConta createContaconta)
+    public async Task<CashFlow> AddAsync(CreateCashFlow createCashFlow)
     {
-        var conta = new Conta
+        var cashFlow = new CashFlow
         {
             Id = Guid.NewGuid().ToString(),
-            Description = createContaconta.Description,
-            Amount = createContaconta.Amount,
-            Status = createContaconta.Status,
-            Type = createContaconta.Type,
+            Description = createCashFlow.Description,
+            Amount = createCashFlow.Amount,
+            Status = createCashFlow.Status,
+            Type = createCashFlow.Type,
             Mouth = DateTime.UtcNow.Month,
             Year = DateTime.UtcNow.Year,
             CreatedAt = DateTime.UtcNow,
-            UserId = createContaconta.UserId!,
+            UserId = createCashFlow.UserId!,
         };
 
-        context.Contas.Add(conta);
+        context.CashFlows.Add(cashFlow);
         await context.SaveChangesAsync();
 
-        return conta;
+        return cashFlow;
     }
 
-    public async Task<Conta> GetByIdAsync(string id, string userId)
+    public async Task<CashFlow> GetByIdAsync(string id, string userId)
     {
-        return await context.Contas.FirstAsync(c =>
-            (c.Id == id || c.Description.Contains(id)) && c.UserId == userId
-        );
+        return await context
+            .CashFlows.AsNoTracking()
+            .FirstAsync(c => (c.Id == id || c.Description.Contains(id)) && c.UserId == userId);
     }
 
-    public async Task<Conta> UpdateAsync(string id, CreateConta createContaconta)
+    public async Task<CashFlow> UpdateAsync(string id, CreateCashFlow updateCashFlow)
     {
         context
-            .Contas.Where(c => c.Id == id && c.UserId == createContaconta.UserId)
+            .CashFlows.Where(c => c.Id == id && c.UserId == updateCashFlow.UserId)
             .ExecuteUpdate(c =>
-                c.SetProperty(c => c.Description, createContaconta.Description)
-                    .SetProperty(c => c.Amount, createContaconta.Amount)
-                    .SetProperty(c => c.Status, createContaconta.Status)
+                c.SetProperty(c => c.Description, updateCashFlow.Description)
+                    .SetProperty(c => c.Amount, updateCashFlow.Amount)
+                    .SetProperty(c => c.Status, updateCashFlow.Status)
             );
 
         await context.SaveChangesAsync();
 
-        var conta = await context.Contas.FirstAsync(c => c.Id == id);
-        return conta;
+        var cashFlow = await context.CashFlows.FirstAsync(c => c.Id == id);
+        return cashFlow;
     }
 
     public async Task DeleteAsync(string id, string userId)
     {
-        await context.Contas.Where(c => c.Id == id && c.UserId == userId).ExecuteDeleteAsync();
+        await context.CashFlows.Where(c => c.Id == id && c.UserId == userId).ExecuteDeleteAsync();
     }
 }

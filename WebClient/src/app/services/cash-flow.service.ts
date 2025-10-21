@@ -8,7 +8,7 @@ import { authTokenKey } from '../models/user-token';
 })
 export class CashFlowService {
   private readonly httpClient = inject(HttpClient);
-  private readonly baseUrl = `${import.meta.env['NG_APP_PUBLIC_URL']}/api/conta`;
+  private readonly baseUrl = `${import.meta.env['NG_APP_PUBLIC_URL']}/api/cashflow`;
   private readonly headers = {
     Authorization: 'Bearer ' + localStorage.getItem(authTokenKey)!,
   };
