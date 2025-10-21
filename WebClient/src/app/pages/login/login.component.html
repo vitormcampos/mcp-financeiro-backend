@@ -10,7 +10,7 @@
         </div>
       }
 
-      <form [formGroup]="loginFormGroup" (ngSubmit)="onSubmitLoginForm()">
+      <form [formGroup]="loginFormGroup">
         <!-- Username -->
         <div class="mb-3">
           <label for="username" class="form-label">Usuário</label>
@@ -47,7 +47,9 @@
           }
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        <button type="button" class="btn btn-primary w-100" (click)="submit()">
+          Entrar
+        </button>
       </form>
     </div>
   </div>

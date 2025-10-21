@@ -21,7 +21,7 @@ export class RegisterComponent {
     confirmPassword: [''],
   });
 
-  onSubmitRegisterForm() {
+  submit() {
     if (this.registerFormGroup.valid) {
       const user: Partial<UserRegister> = this.registerFormGroup.value;
 

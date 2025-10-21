@@ -21,7 +21,7 @@ export class LoginComponent {
     password: [''],
   });
 
-  onSubmitLoginForm() {
+  submit() {
     if (this.loginFormGroup.valid) {
       const user: Partial<UserLogin> = this.loginFormGroup.value;
 

@@ -8,6 +8,10 @@ import { authTokenKey } from '../models/user-token';
 })
 export class CashFlowService {
   private readonly httpClient = inject(HttpClient);
+  private readonly baseUrl = `${import.meta.env['NG_APP_PUBLIC_URL']}/api/conta`;
+  private readonly headers = {
+    Authorization: 'Bearer ' + localStorage.getItem(authTokenKey)!,
+  };
 
   getAll(
     description = '',
@@ -27,15 +31,10 @@ export class CashFlowService {
       .set('Status', status || '')
       .set('Type', type || '');
 
-    return this.httpClient.get<CashFlow[]>(
-      `${import.meta.env['NG_APP_PUBLIC_URL']}/api/conta`,
-      {
-        params,
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem(authTokenKey)!,
-        },
-      },
-    );
+    return this.httpClient.get<CashFlow[]>(this.baseUrl, {
+      params,
+      headers: this.headers,
+    });
   }
 
   create(cashFlow: {
@@ -44,14 +43,8 @@ export class CashFlowService {
     type: string;
     status: string;
   }) {
-    return this.httpClient.post<CashFlow>(
-      `${import.meta.env['NG_APP_PUBLIC_URL']}/api/conta`,
-      cashFlow,
-      {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem(authTokenKey)!,
-        },
-      },
-    );
+    return this.httpClient.post<CashFlow>(this.baseUrl, cashFlow, {
+      headers: this.headers,
+    });
   }
 }
