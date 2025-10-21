@@ -4,7 +4,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CashflowStore } from '../../stores/cashflow.store';
-import { ChatAiStore } from '../../stores/chat-ai.store';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +14,6 @@ import { ChatAiStore } from '../../stores/chat-ai.store';
 export class NavbarComponent {
   private readonly authService = inject(AuthService);
   private readonly cashFlowStore = inject(CashflowStore);
-  private readonly chatAiStore = inject(ChatAiStore);
 
   userIsLoggedIn = this.authService.isLoggedIn();
 
@@ -38,6 +36,4 @@ export class NavbarComponent {
 
     return totalIncome - totalExpense - totalInvestment;
   });
-
-  showChatAi = toSignal(this.chatAiStore.get(), { initialValue: false });
 }

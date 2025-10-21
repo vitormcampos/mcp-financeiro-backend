@@ -23,7 +23,7 @@
       </div>
 
       <div class="row justify-content-center mt-5">
-        <div class="col-9">
+        <div class="col-12 col-md-9">
           <div class="bg-white rounded-3 p-3">
             <app-list />
           </div>
@@ -31,9 +31,6 @@
       </div>
     </div>
   </div>
-  @if (showChatAi()) {
-    <div class="col-4 bg-white">
-      <app-chat-ai />
-    </div>
-  }
 </div>
+
+<app-chat-ai />

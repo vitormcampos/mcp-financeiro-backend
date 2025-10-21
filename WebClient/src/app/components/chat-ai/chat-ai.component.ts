@@ -1,4 +1,12 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ChatService } from '../../services/chat.service';
 import { MarkdownComponent } from 'ngx-markdown';
@@ -12,25 +20,22 @@ import { MarkdownComponent } from 'ngx-markdown';
 export class ChatAiComponent implements OnInit, OnDestroy {
   chatService = inject(ChatService);
 
-  tokenSub = this.chatService.token$.subscribe((token) => {
-    this.resposta.update((r) => (r += token + ' '));
-  });
+  showWindow = signal(false);
+  chats = signal<ChatMessage[]>([]);
 
-  completedSub = this.chatService.completed$.subscribe(() => {
-    this.resposta.update((r) => (r += '\n[Resposta concluída]'));
-  });
+  chatWindowElement = viewChild.required<ElementRef>('chatWindow');
 
   promptSub = this.chatService.prompt$.subscribe((prompt) => {
     this.addMessage({ content: prompt, origin: 'agent' });
   });
 
-  resposta = signal('');
-
   ngOnInit() {
     this.chatService.startConnection();
   }
 
-  chats = signal<ChatMessage[]>([]);
+  toggleWindow() {
+    this.showWindow.update((w) => !w);
+  }
 
   addMessage(message: ChatMessage) {
     this.chats.update((old) => {
@@ -43,17 +48,20 @@ export class ChatAiComponent implements OnInit, OnDestroy {
 
     this.addMessage({ content: message, origin: 'user' });
 
-    this.chatService.sendPrompt(message);
+    const callbackFunction = () => {
+      this.chatWindowElement()?.nativeElement.scrollTo({
+        top: this.chatWindowElement()?.nativeElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    };
 
-    // this.chatService.sendPrompt(message).subscribe((result) => {
-    //   console.log(result);
-    //   this.addMessage({ content: result.message, origin: 'agent' });
-    // });
+    this.chatService.sendPrompt(message, callbackFunction);
+
+    f.resetForm();
   }
 
   ngOnDestroy(): void {
-    this.tokenSub?.unsubscribe();
-    this.completedSub?.unsubscribe();
+    this.promptSub.unsubscribe();
     this.chatService.stopConnection();
   }
 }

@@ -1,29 +1,50 @@
-<div class="row">
-  <div class="col-12" style="height: 85vh; overflow-y: scroll">
-    <ul>
-      @for (item of chats(); track $index) {
-        @if (item.origin == "user") {
-          <li>{{ item.origin }}: {{ item.content }}</li>
+<div class="chatbot-widget">
+  <button class="chat-toggle" (click)="toggleWindow()">
+    <i
+      class="bi bi-chat-left-dots-fill"
+      style="color: white; font-size: 22px"
+    ></i>
+    <div class="notification-badge">New</div>
+  </button>
+  <div class="chat-window" [class.show]="showWindow()">
+    <div class="chat-header">
+      <img class="bot-avatar" src="cashflow-logo.jpg" alt="bot" />
+      <div class="chat-info">
+        <h3 id="chatTitle">CashFlow AI</h3>
+        <p>Online now</p>
+      </div>
+    </div>
+    <div class="chat-messages" #chatWindow>
+      @for (message of chats(); track $index) {
+        @if (message.origin == "user") {
+          <div class="message user">
+            <div class="message-content">
+              {{ message.content }}
+            </div>
+          </div>
         } @else {
-          <markdown [data]="item.content"></markdown>
+          <div class="message bot">
+            <img class="message-avatar" src="cashflow-logo.jpg" alt="bot" />
+            <div class="message-content">
+              <markdown [data]="message.content"></markdown>
+            </div>
+          </div>
         }
       }
-    </ul>
+    </div>
+    <form #f="ngForm" novalidate>
+      <div class="chat-input">
+        <textarea
+          type="text"
+          name="userMessage"
+          class="input-field"
+          rows="1"
+          ngModel
+        ></textarea>
+        <button class="send-button" (click)="submitMessage(f)">
+          <i class="bi bi-send-fill" style="color: white"></i>
+        </button>
+      </div>
+    </form>
   </div>
 </div>
-<form #f="ngForm" novalidate>
-  <div class="row my-3 px-2">
-    <div class="col">
-      <textarea
-        type="text"
-        name="userMessage"
-        rows="1"
-        class="form-control"
-        ngModel
-      ></textarea>
-    </div>
-    <div class="col-2">
-      <button class="btn btn-success" (click)="submitMessage(f)">Enviar</button>
-    </div>
-  </div>
-</form>

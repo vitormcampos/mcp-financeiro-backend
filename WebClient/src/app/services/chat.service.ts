@@ -9,14 +9,9 @@ import { authTokenKey } from '../models/user-token';
 })
 export class ChatService {
   private hubConnection!: signalR.HubConnection;
-
-  private tokenSubject = new Subject<string>();
   private promptSubject = new Subject<string>();
-  private completedSubject = new Subject<void>();
 
-  token$ = this.tokenSubject.asObservable();
   prompt$ = this.promptSubject.asObservable();
-  completed$ = this.completedSubject.asObservable();
 
   startConnection(): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -33,16 +28,8 @@ export class ChatService {
       .then(() => console.log('Conectado ao SignalR'))
       .catch((err) => console.error('Erro ao conectar ao SignalR:', err));
 
-    this.hubConnection.on('ReceiveToken', (token: string) => {
-      this.tokenSubject.next(token);
-    });
-
     this.hubConnection.on('ReceivePrompt', (prompt: string) => {
       this.promptSubject.next(prompt);
-    });
-
-    this.hubConnection.on('Completed', () => {
-      this.completedSubject.next();
     });
   }
 
@@ -50,13 +37,14 @@ export class ChatService {
     this.hubConnection?.stop().then(() => console.log('Conexão encerrada'));
   }
 
-  sendPrompt(message: string) {
+  sendPrompt(message: string, callback: () => void): void {
     if (
       this.hubConnection &&
       this.hubConnection.state === signalR.HubConnectionState.Connected
     ) {
       this.hubConnection
         .invoke('SendPrompt', message)
+        .then(callback)
         .catch((err) => console.error('Erro ao enviar prompt:', err));
     } else {
       console.warn('Conexão com SignalR não está ativa.');

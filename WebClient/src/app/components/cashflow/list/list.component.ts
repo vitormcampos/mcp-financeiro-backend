@@ -5,8 +5,6 @@ import { tap } from 'rxjs';
 import { CashflowStore } from '../../../stores/cashflow.store';
 import { FilterComponent } from '../filter/filter.component';
 import { UpsertComponent } from '../upsert/upsert.component';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ChatAiStore } from '../../../stores/chat-ai.store';
 
 @Component({
   selector: 'app-list',
@@ -17,7 +15,6 @@ import { ChatAiStore } from '../../../stores/chat-ai.store';
 export class ListComponent {
   private readonly cashFlowService = inject(CashFlowService);
   private readonly cashFlowStore = inject(CashflowStore);
-  private readonly chatAiStore = inject(ChatAiStore);
 
   constructor() {
     this.cashFlowService
@@ -27,10 +24,4 @@ export class ListComponent {
   }
 
   cashFlows$ = this.cashFlowStore.get();
-
-  showChatAi = toSignal(this.chatAiStore.get(), { initialValue: false });
-
-  toggleChatAi() {
-    this.chatAiStore.set(!this.showChatAi());
-  }
 }
