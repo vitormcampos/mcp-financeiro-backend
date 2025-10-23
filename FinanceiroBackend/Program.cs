@@ -3,11 +3,15 @@ using dotenv.net;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
 using Scalar.AspNetCore;
+using Web.Extensions;
 using Web.Hubs;
 
-DotEnv.Load();
-
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    DotEnv.Load();
+}
 
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -48,16 +52,9 @@ if (app.Environment.IsDevelopment())
     );
 }
 
-if (app.Environment.IsProduction())
-{
-    app.UseCors(options =>
-        options.WithOrigins(builder.Configuration.GetValue<string>("App:Cors") ?? "")
-    );
-}
-else if (app.Environment.IsDevelopment())
-{
-    app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-}
+app.ApplyCorsConfiguration();
+
+app.ApplyMigrations();
 
 app.UseHttpsRedirection();
 

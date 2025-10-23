@@ -1,0 +1,59 @@
+services:
+  app:
+    build: 
+      context: ./WebClient
+      dockerfile: Dockerfile
+    ports: 
+      - "3000:80"
+    networks:
+      - financeiro-network
+
+  api: 
+    build: 
+      context: .
+      dockerfile: FinanceiroBackend/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - App__Cors=http://localhost:3000
+      - MCPServer__Url=http://mcp-server:55626
+      - OpenAI__ApiKey= ${OpenAI_ApiKey}
+      - ConnectionStrings__DefaultConnection=${ConnectionString}
+      - Jwt__Secret=${Jwt_Secret}
+    ports: 
+      - "5000:5000"
+    networks:
+      - financeiro-network
+    depends_on: 
+      - db
+      
+  mcp-server:
+    build: 
+      context: .
+      dockerfile: FinanceiroMCPServer/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:55626
+      - ConnectionStrings__DefaultConnection=${ConnectionString}
+    networks:
+      - financeiro-network
+    depends_on: 
+      - db
+
+  db:
+    image: postgres:17.6-trixie
+    environment: 
+      POSTGRES_USER: financeiro
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: financeiro
+    volumes: 
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - financeiro-network
+
+volumes: 
+  pgdata:
+
+networks: 
+  financeiro-network:
+    driver: bridge
